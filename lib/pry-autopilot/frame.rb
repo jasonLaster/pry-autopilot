@@ -17,9 +17,13 @@ class PryAutopilot
     end
 
     def eval(*args)
-      @binding.eval(*args)
+      @binding.instance_eval(*args)
     end
     alias var eval
+
+    def exec(&block)
+      @binding.instance_eval &block
+    end
 
   end
 end

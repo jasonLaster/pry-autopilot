@@ -8,10 +8,12 @@ class PryAutopilot
   attr_accessor :input
   attr_reader :predicates
   attr_accessor :_pry_
+  attr_accessor :frame
 
   def initialize(fallback_input=Readline, &block)
     @input = Input.new(self)
     @fallback_input = fallback_input
+    @frame = Frame.new(binding)
     instance_exec(&block) if block
   end
 
@@ -25,11 +27,6 @@ class PryAutopilot
     @predicates << [predicate, block]
   end
 
-  private
-  def frame
-    Frame.new(@_pry_.current_context)
-  end
-
   def fallback_readline(prompt)
     if @fallback_input.method(:readline).arity == 0
       @fallback_input.readline
@@ -41,13 +38,9 @@ class PryAutopilot
   def process_predicates
     return if !predicates
     predicates.each do |predicate, block|
-      if predicate.call(frame)
-        block.call(input)
+      if frame.exec &predicate
+        frame.exec &block
       end
     end
   end
-end
-
-Pry.config.hooks.add_hook(:when_started, :init_autopilot) do |_, _, _pry_|
-  _pry_.input._pry_ = _pry_ if _pry_.input.is_a?(PryAutopilot)
 end
