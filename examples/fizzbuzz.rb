@@ -6,16 +6,15 @@ Pry.hooks.clear(:before_session)
 
 my_pilot = PryAutopilot.new do
 
-  on lambda {|f| @i % 15 == 0} do 
+  on ->(f) {@i % 15 == 0} do
     puts "#{@i}:\tfizzbuzz"
-    binding.pry
   end
 
-  on lambda {|f| @i % 3 == 0} do 
+  on ->(f) {@i % 3 == 0} do
     puts "#{@i}:\tfizz"
   end
 
-  on lambda {|f| @i % 5 == 0} do 
+  on ->(f) {@i % 5 == 0} do
     puts "#{@i}:\tbuzz"
   end
 end
